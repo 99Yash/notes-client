@@ -1,51 +1,11 @@
 import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
-import { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import { Note } from '@/interfaces/note.interface';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const notesArray: Note[] = [];
 export default function Home() {
-  const [note, setNote] = useState<Note>({
-    title: '',
-    content: '',
-  });
-
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNote({
-      ...note,
-      title: e.target.value,
-    });
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNote({
-      ...note,
-      content: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(note);
-    notesArray.push(note);
-    fetch('http://localhost:5000/api/notes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(note),
-    });
-    console.log(notesArray);
-    setNote({
-      title: '',
-      content: '',
-    });
-  };
-
   return (
     <>
       <Head>
@@ -55,30 +15,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar />
-      <main className={`${inter.className} ${styles.main} `}>
-        <form onSubmit={handleSubmit}>
-          <h1 className="text-center mb-4 ">Add a Note</h1>
-          <div className="flex flex-col gap-6 items-center justify-center">
-            <input
-              onChange={handleTitleChange}
-              className="bg-transparent w-full border rounded-xl px-4 py-2 "
-              value={note?.title}
-              type="text"
-              placeholder="Add Title"
-            />
-            <textarea
-              value={note?.content}
-              onChange={handleContentChange}
-              name="note"
-              placeholder="Add Content"
-              className="bg-transparent w-full border rounded-xl px-4 py-2 "
-              cols={80}
-              rows={7}
-            ></textarea>
-            <button className=" rounded-xl border px-4 py-2">Create</button>
-          </div>
-        </form>
-        {notesArray.length > 0 &&
+      <main className={`${inter.className} ${styles.main}`}>
+        {/* {notesArray.length > 0 &&
           notesArray.map((note) => {
             return (
               <div
@@ -89,7 +27,7 @@ export default function Home() {
                 <p className="font-extralight">{note.content}</p>
               </div>
             );
-          })}
+          })} */}
       </main>
     </>
   );
