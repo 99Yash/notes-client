@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 const Navbar = () => {
   return (
-    <div className={`${inter.className} h-screen `}>
+    <div className={`${inter.className} h-screen w-full `}>
       <nav className="pt-4">
         <ul className="flex gap-32 px-8 w-full justify-between">
           <div className="self-start">

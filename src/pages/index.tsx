@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { Inter } from '@next/font/google';
-import styles from '@/styles/Home.module.css';
 import Navbar from '@/components/Navbar';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -14,20 +14,27 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
-      <main className={`${inter.className} ${styles.main}`}>
+      <main className={`${inter.className}`}>
         {/* {notesArray.length > 0 &&
           notesArray.map((note) => {
             return (
               <div
                 key={Math.random()}
                 className="flex border-red-400 flex-col gap-2 items-center justify-center"
-              >
+                >
                 <h1 className="font-semibold self-start ">{note.title}</h1>
                 <p className="font-extralight">{note.content}</p>
               </div>
             );
           })} */}
+
+        <Navbar />
+        <Link
+          href="/add-note"
+          className="fixed bottom-0 right-0 p-4 mx-12 my-8 bg-rose-500 text-white rounded-full duration-150 hover:bg-rose-600 shadow-xl"
+        >
+          +
+        </Link>
       </main>
     </>
   );

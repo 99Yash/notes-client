@@ -3,14 +3,21 @@ import { Inter } from '@next/font/google';
 import { Note } from '@/interfaces/note.interface';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { addNote } from '@/store/slices/notes.slice';
+import { nanoid } from 'nanoid';
 
 const inter = Inter({ subsets: ['latin'] });
 const notesArray: Note[] = [];
 
 const AddNote = () => {
+  const notes = useAppSelector((state) => state.notes);
+  const dispatch = useAppDispatch();
+
   const [note, setNote] = useState<Note>({
     title: '',
     content: '',
+    id: undefined,
   });
 
   const router = useRouter();
@@ -32,8 +39,15 @@ const AddNote = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(note);
-    notesArray.push(note);
     if (!note.title || !note.content) return;
+    setNote({
+      ...note,
+      id: nanoid(),
+    });
+    console.log(note);
+
+    dispatch(addNote(note));
+    notesArray.push(note);
     fetch('http://localhost:5000/api/notes', {
       method: 'POST',
       headers: {
@@ -45,6 +59,7 @@ const AddNote = () => {
     setNote({
       title: '',
       content: '',
+      id: undefined,
     });
     router.push('/');
   };

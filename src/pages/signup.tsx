@@ -1,13 +1,14 @@
-import React from 'react';
 import { Inter } from '@next/font/google';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const Login = () => {
+const Signup = () => {
   const router = useRouter();
+
   const [creds, setCreds] = useState({
+    name: '',
     email: '',
     password: '',
   });
@@ -26,14 +27,21 @@ const Login = () => {
     });
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCreds({
+      ...creds,
+      name: e.target.value,
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     console.log(creds);
 
-    if (!creds.email || !creds.password) return;
+    if (!creds.email || !creds.password || !creds.name) return;
 
-    fetch('http://localhost:5000/api/users/login', {
+    fetch('http://localhost:5000/api/users/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,6 +59,18 @@ const Login = () => {
         onSubmit={handleSubmit}
         className="md:w-2/5 w-2/3 flex flex-col gap-6 items-center justify-center "
       >
+        <label htmlFor="name" className="font-semibold">
+          Name
+        </label>
+        <input
+          type="text"
+          name="name"
+          onChange={handleNameChange}
+          id="name"
+          className="bg-transparent w-full border rounded-xl px-4 py-2 "
+          placeholder="eg. John Doe"
+        />
+
         <label htmlFor="email" className="font-semibold">
           Email
         </label>
@@ -60,8 +80,9 @@ const Login = () => {
           onChange={handleEmailChange}
           id="email"
           className="bg-transparent w-full border rounded-xl px-4 py-2 "
-          placeholder="test@ok.com"
+          placeholder="eg. test@ok.com"
         />
+
         <label htmlFor="password" className="font-semibold">
           Password
         </label>
@@ -73,11 +94,11 @@ const Login = () => {
           id="password"
         />
         <button className="rounded-xl mt-4 self-stretch border-red-100 text-yellow-500 border px-4 py-2 ">
-          Login
+          Sign Up
         </button>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Signup;
