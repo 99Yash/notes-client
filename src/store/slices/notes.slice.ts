@@ -1,35 +1,40 @@
 import { Note } from '../../interfaces/note.interface';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface NoteState {
-  notes: Note[] | null;
+export interface NoteState {
+  notes: Note[];
 }
 
 const initialState: NoteState = {
-  notes: null,
+  notes: [],
 };
 
 export const NoteSlice = createSlice({
   name: 'notes',
   initialState,
   reducers: {
-    setNotes: (state: NoteState, action: PayloadAction<Note[]>) => {
-      state.notes = action.payload;
+    setNotes: (state: NoteState, action: PayloadAction<{ notes: Note[] }>) => {
+      state.notes = action.payload.notes;
     },
-    addNote: (state, action: PayloadAction<Note>) => {
-      state.notes?.push(action.payload);
+    addNote: (state, action: PayloadAction<{ note: Note }>) => {
+      state.notes.push(action.payload.note);
+      console.log(state.notes);
     },
     updateNote: (state, action: PayloadAction<Note>) => {
-      const noteIndex = state.notes?.findIndex(
-        (note) => note.id === action.payload.id
+      const noteToUpdate = state.notes?.find(
+        (note) => note._id === action.payload._id
       );
-      if (noteIndex !== undefined) {
-        state.notes![noteIndex] = action.payload;
+      if (noteToUpdate) {
+        noteToUpdate.title = action.payload.title;
+        noteToUpdate.content = action.payload.content;
       }
+      // if (noteIndex !== undefined) {
+      //   state.notes![noteIndex] = action.payload;
+      // }
     },
     deleteNote: (state, action: PayloadAction<string>) => {
       const noteIndex = state.notes?.findIndex(
-        (note) => note.id === action.payload
+        (note) => note._id === action.payload
       );
       if (noteIndex !== undefined) {
         state.notes?.splice(noteIndex, 1);

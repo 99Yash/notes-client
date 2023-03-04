@@ -3,63 +3,71 @@ import { Inter } from '@next/font/google';
 import { Note } from '@/interfaces/note.interface';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { useAppDispatch } from '@/hooks/redux';
 import { addNote } from '@/store/slices/notes.slice';
 import { nanoid } from 'nanoid';
+import axios from 'axios';
+import { useAppSelector } from '../hooks/redux';
 
 const inter = Inter({ subsets: ['latin'] });
-const notesArray: Note[] = [];
 
 const AddNote = () => {
-  const notes = useAppSelector((state) => state.notes);
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   const [note, setNote] = useState<Note>({
     title: '',
     content: '',
-    id: undefined,
+    _id: undefined,
   });
 
   const router = useRouter();
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNote({
-      ...note,
-      title: e.target.value,
-    });
+    setNote((prevNote) => ({ ...prevNote, title: e.target.value }));
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNote({
-      ...note,
-      content: e.target.value,
-    });
+    setNote((prevNote) => ({ ...prevNote, content: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(note);
-    if (!note.title || !note.content) return;
-    setNote({
-      ...note,
-      id: nanoid(),
-    });
-    console.log(note);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return router.push('/log-in');
+    }
 
-    dispatch(addNote(note));
-    notesArray.push(note);
-    fetch('http://localhost:5000/api/notes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(note),
-    });
-    console.log(notesArray);
+    if (!note.title || !note.content) return;
+    setNote((prevNote) => ({ ...prevNote, _id: nanoid() }));
+    try {
+      const { data } = await axios.post(
+        'http://localhost:5000/api/notes',
+        { note, user },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(data);
+      dispatch(
+        addNote({
+          note: {
+            _id: data._id,
+            title: data.title,
+            content: data.content,
+          },
+        })
+      );
+    } catch (err) {
+      console.log(err);
+    }
     setNote({
       title: '',
       content: '',
-      id: undefined,
+      _id: undefined,
     });
     router.push('/');
   };

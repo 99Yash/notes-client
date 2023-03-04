@@ -1,13 +1,22 @@
 import { Inter } from '@next/font/google';
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import { useAppDispatch } from '@/hooks/redux';
+import { setUser } from '@/store/slices/user.slice';
 
 const inter = Inter({ subsets: ['latin'] });
+interface SignupForm {
+  name: string;
+  email: string;
+  password: string;
+}
 
 const Signup = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const [creds, setCreds] = useState({
+  const [creds, setCreds] = useState<SignupForm>({
     name: '',
     email: '',
     password: '',
@@ -34,20 +43,28 @@ const Signup = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log(creds);
 
     if (!creds.email || !creds.password || !creds.name) return;
 
-    fetch('http://localhost:5000/api/users/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(creds),
-    });
+    try {
+      const { data } = await axios.post(
+        'http://localhost:5000/api/users/signup',
+        creds,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      localStorage.setItem('token', data.token);
+      console.log(data);
+      dispatch(setUser(data));
+    } catch (err: any) {
+      console.log(err);
+    }
+
     router.push('/');
   };
 

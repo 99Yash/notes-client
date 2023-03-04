@@ -2,10 +2,36 @@ import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { NoteState, setNotes } from '@/store/slices/notes.slice';
+import { Note } from '@/interfaces/note.interface';
+import axios from 'axios';
+import { setUser } from '@/store/slices/user.slice';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
+  const notes = useAppSelector((state) => state.notes);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const fetchNotes = async () => {
+      try {
+        const { data } = await axios.get<Note[]>(
+          'http://localhost:5000/api/notes'
+        );
+        dispatch(setNotes({ notes: data }));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchNotes();
+  }, [dispatch]);
+
   return (
     <>
       <Head>
@@ -15,13 +41,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${inter.className}`}>
-        {/* {notesArray.length > 0 &&
-          notesArray.map((note) => {
+        {/* {notes.notes?.length > 0 &&
+          notes.notes?.map((note: Note) => {
             return (
               <div
                 key={Math.random()}
                 className="flex border-red-400 flex-col gap-2 items-center justify-center"
-                >
+              >
                 <h1 className="font-semibold self-start ">{note.title}</h1>
                 <p className="font-extralight">{note.content}</p>
               </div>
@@ -31,7 +57,7 @@ export default function Home() {
         <Navbar />
         <Link
           href="/add-note"
-          className="fixed bottom-0 right-0 p-4 mx-12 my-8 bg-rose-500 text-white rounded-full duration-150 hover:bg-rose-600 shadow-xl"
+          className="fixed bottom-0 right-0 p-4 mx-12 my-8 bg-yellow-100 text-black rounded-full duration-150 shadow-xl"
         >
           +
         </Link>
