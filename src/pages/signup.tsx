@@ -59,12 +59,10 @@ const Signup = () => {
         }
       );
       localStorage.setItem('token', data.token);
-      console.log(data);
       dispatch(setUser(data));
     } catch (err: any) {
       console.log(err);
     }
-
     router.push('/');
   };
 

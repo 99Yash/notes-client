@@ -1,5 +1,6 @@
 import { User } from '@/interfaces/user.interface';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { reset } from './notes.slice';
 
 interface UserOrNull {
   user: User | null;
@@ -19,13 +20,14 @@ export const UserSlice = createSlice({
       state.user = action.payload;
       state.isLoggedIn = true;
     },
-    clearUser: (state: UserOrNull) => {
-      state.user = null;
-      state.isLoggedIn = false;
-    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(reset, (state, action) => {
+      return initialState;
+    });
   },
 });
 
-export const { setUser, clearUser } = UserSlice.actions;
+export const { setUser } = UserSlice.actions;
 
 export default UserSlice.reducer;

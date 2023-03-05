@@ -14,7 +14,6 @@ const inter = Inter({ subsets: ['latin'] });
 const AddNote = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-
   const [note, setNote] = useState<Note>({
     title: '',
     content: '',
@@ -51,7 +50,6 @@ const AddNote = () => {
           },
         }
       );
-      console.log(data);
       dispatch(
         addNote({
           note: {

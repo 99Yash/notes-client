@@ -1,5 +1,5 @@
 import { Note } from '../../interfaces/note.interface';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface NoteState {
   notes: Note[];
@@ -8,6 +8,8 @@ export interface NoteState {
 const initialState: NoteState = {
   notes: [],
 };
+
+export const reset = createAction('app/reset');
 
 export const NoteSlice = createSlice({
   name: 'notes',
@@ -40,6 +42,11 @@ export const NoteSlice = createSlice({
         state.notes?.splice(noteIndex, 1);
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(reset, (state, action) => {
+      return initialState;
+    });
   },
 });
 

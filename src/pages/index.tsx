@@ -8,11 +8,13 @@ import { NoteState, setNotes } from '@/store/slices/notes.slice';
 import { Note } from '@/interfaces/note.interface';
 import axios from 'axios';
 import { setUser } from '@/store/slices/user.slice';
+import SingleNote from '@/components/SingleNote';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const notes = useAppSelector((state) => state.notes);
+  const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -41,20 +43,18 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${inter.className}`}>
-        {/* {notes.notes?.length > 0 &&
+        <Navbar />
+        {notes.notes?.length > 0 &&
           notes.notes?.map((note: Note) => {
             return (
-              <div
-                key={Math.random()}
-                className="flex border-red-400 flex-col gap-2 items-center justify-center"
-              >
-                <h1 className="font-semibold self-start ">{note.title}</h1>
-                <p className="font-extralight">{note.content}</p>
-              </div>
+              <SingleNote
+                key={note._id}
+                title={note.title}
+                content={note.content}
+                _id={note._id}
+              />
             );
-          })} */}
-
-        <Navbar />
+          })}
         <Link
           href="/add-note"
           className="fixed bottom-0 right-0 p-4 mx-12 my-8 bg-yellow-100 text-black rounded-full duration-150 shadow-xl"
