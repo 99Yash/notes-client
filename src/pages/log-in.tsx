@@ -3,7 +3,7 @@ import { Inter } from '@next/font/google';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { useAppDispatch } from '@/hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { setUser } from '@/store/slices/user.slice';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -16,7 +16,8 @@ interface LoginForm {
 const Login = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  const user = useAppSelector((state) => state.user);
+  let userId: string;
   const [creds, setCreds] = useState<LoginForm>({
     email: '',
     password: '',
@@ -48,18 +49,28 @@ const Login = () => {
         {
           headers: {
             'Content-Type': 'application/json',
+            //no jwt as its a login form
           },
         }
       );
-
+      console.log(data);
       localStorage.setItem('token', data.token);
-      dispatch(setUser(data.existingUser));
+      userId = data.existingUser._id;
+      dispatch(
+        setUser({
+          _id: userId,
+          name: data.existingUser.name,
+          email: data.existingUser.email,
+          password: data.existingUser.password,
+          notes: data.existingUser.notes,
+        })
+      );
     } catch (err) {
       console.log(err);
     }
-    router.push('/');
+    router.push(`/${userId}/notes`);
   };
-
+  console.log(user);
   return (
     <div
       className={`${inter.className} h-screen flex flex-col items-center justify-center `}

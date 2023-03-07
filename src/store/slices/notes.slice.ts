@@ -30,9 +30,6 @@ export const NoteSlice = createSlice({
         noteToUpdate.title = action.payload.title;
         noteToUpdate.content = action.payload.content;
       }
-      // if (noteIndex !== undefined) {
-      //   state.notes![noteIndex] = action.payload;
-      // }
     },
     deleteNote: (state, action: PayloadAction<string>) => {
       const noteIndex = state.notes?.findIndex(
