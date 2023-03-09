@@ -41,14 +41,7 @@ const Notes = () => {
   return (
     <div>
       {notes.notes?.map((note) => {
-        return (
-          <SingleNote
-            key={note._id}
-            title={note.title}
-            content={note.content}
-            _id={note._id}
-          />
-        );
+        return <SingleNote key={note._id} note={note} />;
       })}
     </div>
   );

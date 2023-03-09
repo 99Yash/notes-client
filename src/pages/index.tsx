@@ -4,7 +4,12 @@ import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { NoteState, reset, setNotes } from '@/store/slices/notes.slice';
+import {
+  NoteState,
+  reset,
+  setNotes,
+  deleteNote,
+} from '@/store/slices/notes.slice';
 import { Note } from '@/interfaces/note.interface';
 import axios from 'axios';
 import { setUser } from '@/store/slices/user.slice';
@@ -55,14 +60,7 @@ export default function Home() {
       <main className={`${inter.className}`}>
         {notes.notes?.length > 0 &&
           notes.notes?.map((note: Note) => {
-            return (
-              <SingleNote
-                key={note._id}
-                title={note.title}
-                content={note.content}
-                _id={note._id}
-              />
-            );
+            return <SingleNote key={note._id} note={note} />;
           })}
         {user.isLoggedIn && (
           <Link
