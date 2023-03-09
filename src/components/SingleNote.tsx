@@ -14,9 +14,11 @@ const SingleNote = (props: SingleNoteProps) => {
   const dispatch = useAppDispatch();
 
   const user = useAppSelector((state) => state.user);
+
   const handleEdit = () => {
     router.push(`/notes/${props.note._id}`);
   };
+
   const handleDelete = async () => {
     dispatch(deleteNote(props.note._id!));
     try {
@@ -26,20 +28,30 @@ const SingleNote = (props: SingleNoteProps) => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      router.push(`/notes/${user.user?._id}`);
+      await axios.get(
+        `http://localhost:5000/api/notes/user/${user.user?._id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <div
-      onClick={handleEdit}
-      className=" flex justify-between border rounded-sm p-4 m-4"
-    >
-      <div className="flex flex-col">
-        <h1>{props.note.title}</h1>
-        <p>{props.note.content}</p>
+    <div className=" ">
+      <div
+        onClick={handleEdit}
+        className=" flex justify-between cursor-pointer border rounded-sm p-4 m-4"
+      >
+        <div className="flex flex-col">
+          <h1 className="text-md font-bold">{props.note.title}</h1>
+          <p>{props.note.content}</p>
+        </div>
       </div>
       <button
         onClick={handleDelete}
