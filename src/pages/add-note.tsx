@@ -62,12 +62,12 @@ const AddNote = () => {
     } catch (err) {
       console.log(err);
     }
+    router.push('/');
     setNote({
       title: '',
       content: '',
       _id: undefined,
     });
-    router.push('/');
   };
 
   return (

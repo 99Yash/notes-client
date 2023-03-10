@@ -1,5 +1,5 @@
 import { Note } from '@/interfaces/note.interface';
-import React, { FC } from 'react';
+import React, { FC, MouseEventHandler } from 'react';
 import { useRouter } from 'next/router';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { deleteNote } from '@/store/slices/notes.slice';
@@ -19,7 +19,8 @@ const SingleNote = (props: SingleNoteProps) => {
     router.push(`/notes/${props.note._id}`);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event?.stopPropagation();
     dispatch(deleteNote(props.note._id!));
     try {
       await axios.delete(`http://localhost:5000/api/notes/${props.note._id}`, {
@@ -43,15 +44,13 @@ const SingleNote = (props: SingleNoteProps) => {
   };
 
   return (
-    <div className=" ">
-      <div
-        onClick={handleEdit}
-        className=" flex justify-between cursor-pointer border rounded-sm p-4 m-4"
-      >
-        <div className="flex flex-col">
-          <h1 className="text-md font-bold">{props.note.title}</h1>
-          <p>{props.note.content}</p>
-        </div>
+    <div
+      onClick={handleEdit}
+      className=" flex justify-between cursor-pointer border rounded-sm p-4 m-4"
+    >
+      <div className="flex flex-col">
+        <h1 className="text-md font-bold">{props.note.title}</h1>
+        <p>{props.note.content}</p>
       </div>
       <button
         onClick={handleDelete}

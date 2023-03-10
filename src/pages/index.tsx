@@ -1,35 +1,43 @@
-import Head from 'next/head';
-import { Inter } from '@next/font/google';
-import Navbar from '@/components/Navbar';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import {
-  NoteState,
-  reset,
-  setNotes,
-  deleteNote,
-} from '@/store/slices/notes.slice';
-import { Note } from '@/interfaces/note.interface';
-import axios from 'axios';
-import { setUser } from '@/store/slices/user.slice';
 import SingleNote from '@/components/SingleNote';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { Note } from '@/interfaces/note.interface';
+import { reset, setNotes } from '@/store/slices/notes.slice';
+import { Inter } from '@next/font/google';
+import axios from 'axios';
+import jwtDecode from 'jwt-decode';
+import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
+interface DecodedToken {
+  exp: number;
+}
 export default function Home() {
   const notes = useAppSelector((state) => state.notes);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  const [isExpired, setIsExpired] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      dispatch(reset());
+
+    if (token) {
+      const decodedToken = jwtDecode<DecodedToken>(token);
+      const currentTime = Date.now() / 1000;
+      if (!decodedToken.exp) {
+        throw new Error('Token has no expiration date');
+      }
+      if (decodedToken.exp < currentTime) {
+        setIsExpired(true);
+        localStorage.removeItem('token');
+      }
     }
-  }, [user, dispatch]);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -38,7 +46,7 @@ export default function Home() {
     const fetchNotes = async () => {
       try {
         const { data } = await axios.get<Note[]>(
-          'http://localhost:5000/api/notes'
+          `http://localhost:5000/api/notes/user/${user.user?._id}}`
         );
         dispatch(setNotes({ notes: data }));
       } catch (error) {

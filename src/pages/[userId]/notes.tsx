@@ -20,11 +20,17 @@ const Notes = () => {
     }
   }, [user, dispatch]);
 
+  //!
   useEffect(() => {
     const fetchNotesByUser = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/notes/user/${userId}`
+          `http://localhost:5000/api/notes/user/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
         );
         dispatch(
           setNotes({

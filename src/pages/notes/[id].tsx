@@ -4,7 +4,9 @@ import axios from 'axios';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { updateNote } from '@/store/slices/notes.slice';
+import { Inter } from '@next/font/google';
 
+const inter = Inter({ subsets: ['latin'] });
 const EditNote = () => {
   const router = useRouter();
   const { id } = router.query as { id: string | undefined };
@@ -84,38 +86,33 @@ const EditNote = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="field">
-        <label className="label">Title</label>
-        <div className="control">
+    <div
+      className={`${inter.className} h-screen flex flex-col items-center justify-center `}
+    >
+      <form className="md:w-4/5 w-11/12" onSubmit={handleSubmit}>
+        <h1 className="text-center mb-4">Edit</h1>
+        <div className="flex flex-col gap-6 items-center justify-center">
           <input
-            className="input"
+            className="bg-transparent w-full border rounded-xl px-4 py-2"
             type="text"
             name="title"
             value={note.title}
             onChange={handleChange}
           />
-        </div>
-      </div>
-
-      <div className="field">
-        <label className="label">Content</label>
-        <div className="control">
           <textarea
-            className="textarea"
+            className="bg-transparent w-full border rounded-xl px-4 py-2"
             name="content"
+            cols={80}
+            rows={7}
             value={note.content}
             onChange={handleChange}
           ></textarea>
+          <button className=" rounded-xl self-stretch border-red-100 text-yellow-500 border px-4 py-2">
+            Save
+          </button>
         </div>
-      </div>
-
-      <div className="field">
-        <div className="control">
-          <button className="button is-link">Save</button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
