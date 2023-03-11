@@ -1,5 +1,5 @@
-import { Note } from '../../interfaces/note.interface';
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Note } from '../../interfaces/note.interface';
 
 export interface NoteState {
   notes: Note[];
@@ -20,7 +20,6 @@ export const NoteSlice = createSlice({
     },
     addNote: (state, action: PayloadAction<{ note: Note }>) => {
       state.notes.push(action.payload.note);
-      console.log(state.notes);
     },
     updateNote: (state, action: PayloadAction<Note>) => {
       const noteToUpdate = state.notes?.find(

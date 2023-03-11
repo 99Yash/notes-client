@@ -1,12 +1,11 @@
-import React from 'react';
-import { Inter } from '@next/font/google';
-import { Note } from '@/interfaces/note.interface';
-import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { useAppDispatch } from '@/hooks/redux';
+import { Note } from '@/interfaces/note.interface';
 import { addNote } from '@/store/slices/notes.slice';
-import { nanoid } from 'nanoid';
+import { Inter } from '@next/font/google';
 import axios from 'axios';
+import { nanoid } from 'nanoid';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
 import { useAppSelector } from '../hooks/redux';
 
 const inter = Inter({ subsets: ['latin'] });

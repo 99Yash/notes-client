@@ -1,9 +1,9 @@
-import { Inter } from '@next/font/google';
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
 import { useAppDispatch } from '@/hooks/redux';
 import { setUser } from '@/store/slices/user.slice';
+import { Inter } from '@next/font/google';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 interface SignupForm {

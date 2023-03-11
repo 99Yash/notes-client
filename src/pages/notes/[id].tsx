@@ -1,10 +1,9 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import React from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { updateNote } from '@/store/slices/notes.slice';
 import { Inter } from '@next/font/google';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 
 const inter = Inter({ subsets: ['latin'] });
 const EditNote = () => {

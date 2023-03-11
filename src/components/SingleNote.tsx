@@ -1,9 +1,9 @@
 import { Note } from '@/interfaces/note.interface';
-import React, { FC, MouseEventHandler } from 'react';
-import { useRouter } from 'next/router';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { deleteNote } from '@/store/slices/notes.slice';
 import axios from 'axios';
+import { useRouter } from 'next/router';
+import React from 'react';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
 
 interface SingleNoteProps {
   note: Note;

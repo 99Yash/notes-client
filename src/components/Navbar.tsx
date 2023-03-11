@@ -1,17 +1,50 @@
-import React from 'react';
-import Link from 'next/link';
+import { reset } from '@/store/slices/notes.slice';
+import { setUser } from '@/store/slices/user.slice';
 import { Inter } from '@next/font/google';
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { useRouter } from 'next/router';
-import { reset } from '@/store/slices/notes.slice';
 
 const inter = Inter({ subsets: ['latin'] });
 
 const Navbar = () => {
-  const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const user = useAppSelector((state) => state.user);
+  interface DecodedToken {
+    id: string;
+    email: string;
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    if (token) {
+      const decoded = jwt.decode(token) as DecodedToken;
+      const id = decoded?.id;
+      const fetchUser = async () => {
+        try {
+          const user = await axios.get(
+            `http://localhost:5000/api/users/${id}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          //* infinite loop here. so, removed 'user' from dependency array
+          dispatch(setUser(user.data));
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchUser();
+    }
+  }, [dispatch]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -41,10 +74,10 @@ const Navbar = () => {
           {!user.isLoggedIn && (
             <div className="flex gap-12 ">
               <li>
-                <Link href="/log-in">Login</Link>
+                <Link href="/log-in?login=true">Login</Link>
               </li>
               <li>
-                <Link href="/signup">Signup</Link>
+                <Link href="/signup?signup=true">Signup</Link>
               </li>
             </div>
           )}

@@ -1,27 +1,25 @@
 import SingleNote from '@/components/SingleNote';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { Note } from '@/interfaces/note.interface';
-import { reset, setNotes } from '@/store/slices/notes.slice';
+import { setNotes } from '@/store/slices/notes.slice';
 import { Inter } from '@next/font/google';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
 interface DecodedToken {
   exp: number;
 }
+
 export default function Home() {
   const notes = useAppSelector((state) => state.notes);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
-
-  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -33,7 +31,6 @@ export default function Home() {
         throw new Error('Token has no expiration date');
       }
       if (decodedToken.exp < currentTime) {
-        setIsExpired(true);
         localStorage.removeItem('token');
       }
     }
@@ -70,14 +67,6 @@ export default function Home() {
           notes.notes?.map((note: Note) => {
             return <SingleNote key={note._id} note={note} />;
           })}
-        {user.isLoggedIn && (
-          <Link
-            href="/add-note"
-            className="fixed bottom-0 right-0 p-4 mx-12 my-8 bg-yellow-100 text-black rounded-full duration-150 shadow-xl"
-          >
-            +
-          </Link>
-        )}
       </main>
     </>
   );
