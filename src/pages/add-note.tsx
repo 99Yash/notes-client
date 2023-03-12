@@ -2,7 +2,7 @@ import { useAppDispatch } from '@/hooks/redux';
 import { Note } from '@/interfaces/note.interface';
 import { addNote } from '@/store/slices/notes.slice';
 import { Inter } from '@next/font/google';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { nanoid } from 'nanoid';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -39,7 +39,14 @@ const AddNote = () => {
     if (!note.title || !note.content) return;
     setNote((prevNote) => ({ ...prevNote, _id: nanoid() }));
     try {
-      const { data } = await axios.post(
+      const { data } = await axios.post<
+        Note,
+        AxiosResponse<{
+          id: string;
+          title: string;
+          content: string;
+        }>
+      >(
         'http://localhost:5000/api/notes',
         { note, user },
         {
