@@ -21,7 +21,6 @@ const SingleNote = (props: SingleNoteProps) => {
 
   const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event?.stopPropagation();
-    dispatch(deleteNote(props.note._id!));
     try {
       await axios.delete(`http://localhost:5000/api/notes/${props.note._id}`, {
         headers: {
@@ -29,6 +28,7 @@ const SingleNote = (props: SingleNoteProps) => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+      dispatch(deleteNote(props.note._id!));
       await axios.get(
         `http://localhost:5000/api/notes/user/${user.user?._id}`,
         {

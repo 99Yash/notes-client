@@ -1,4 +1,5 @@
 import { useAppDispatch } from '@/hooks/redux';
+import { User } from '@/interfaces/user.interface';
 import { setUser } from '@/store/slices/user.slice';
 import { Inter } from '@next/font/google';
 import axios from 'axios';
@@ -22,24 +23,12 @@ const Signup = () => {
     password: '',
   });
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCreds({
-      ...creds,
-      email: e.target.value,
-    });
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCreds({
-      ...creds,
-      password: e.target.value,
-    });
-  };
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCreds({
-      ...creds,
-      name: e.target.value,
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCreds((prevCreds) => {
+      return {
+        ...prevCreds,
+        [e.target.name]: e.target.value,
+      };
     });
   };
 
@@ -49,7 +38,7 @@ const Signup = () => {
     if (!creds.email || !creds.password || !creds.name) return;
 
     try {
-      const { data } = await axios.post(
+      const { data } = await axios.post<{ token: string; user: User }>(
         'http://localhost:5000/api/users/signup',
         creds,
         {
@@ -59,9 +48,17 @@ const Signup = () => {
         }
       );
       localStorage.setItem('token', data.token);
-      dispatch(setUser(data));
+
+      dispatch(
+        setUser({
+          user: {
+            ...data.user,
+            token: data.token,
+          },
+        })
+      );
     } catch (err: any) {
-      console.log(err);
+      throw new Error("Couldn't sign up", err);
     }
     router.push('/');
   };
@@ -80,7 +77,7 @@ const Signup = () => {
         <input
           type="text"
           name="name"
-          onChange={handleNameChange}
+          onChange={handleInputChange}
           id="name"
           className="bg-transparent w-full border rounded-xl px-4 py-2 "
           placeholder="eg. John Doe"
@@ -92,7 +89,7 @@ const Signup = () => {
         <input
           type="email"
           name="email"
-          onChange={handleEmailChange}
+          onChange={handleInputChange}
           id="email"
           className="bg-transparent w-full border rounded-xl px-4 py-2 "
           placeholder="eg. test@ok.com"
@@ -105,7 +102,7 @@ const Signup = () => {
           type="password"
           className="bg-transparent w-full border rounded-xl px-4 py-2 "
           name="password"
-          onChange={handlePasswordChange}
+          onChange={handleInputChange}
           id="password"
         />
         <button className="rounded-xl mt-4 self-stretch border-red-100 text-yellow-500 border px-4 py-2 ">

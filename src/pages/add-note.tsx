@@ -52,7 +52,7 @@ const AddNote = () => {
       dispatch(
         addNote({
           note: {
-            _id: data._id,
+            _id: data.id,
             title: data.title,
             content: data.content,
           },
