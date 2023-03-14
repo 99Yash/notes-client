@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { User } from '@/interfaces/user.interface';
 import { setUser } from '@/store/slices/user.slice';
 import { Inter } from '@next/font/google';
@@ -16,7 +16,7 @@ interface SignupForm {
 const Signup = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  const user = useAppSelector((state) => state.user);
   const [creds, setCreds] = useState<SignupForm>({
     name: '',
     email: '',
@@ -57,6 +57,7 @@ const Signup = () => {
           },
         })
       );
+      console.log(user);
     } catch (err: any) {
       throw new Error("Couldn't sign up", err);
     }

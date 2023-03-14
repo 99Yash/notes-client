@@ -1,10 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { User } from '@/interfaces/user.interface';
 import { setUser } from '@/store/slices/user.slice';
 import { Inter } from '@next/font/google';
 import axios, { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { User } from '@/interfaces/user.interface';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,6 +16,8 @@ interface LoginForm {
 const Login = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  const user = useAppSelector((state) => state.user);
   const [creds, setCreds] = useState<LoginForm>({
     email: '',
     password: '',
@@ -36,25 +38,68 @@ const Login = () => {
     if (!creds.email || !creds.password) return;
 
     try {
-      const { data } = await axios.post<
-        LoginForm,
-        AxiosResponse<{ existingUser: User; token: string }>
-      >('http://localhost:5000/api/users/login', creds, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      localStorage.setItem('token', data.token);
-      dispatch(
-        setUser({
-          user: data.existingUser,
-        })
-      );
-      console.log(data);
+      if (!router.query.from) {
+        const { data } = await axios.post<
+          LoginForm,
+          AxiosResponse<{ existingUser: User; token: string }>
+        >('http://localhost:5000/api/users/login', creds, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        localStorage.setItem('token', data.token);
+
+        dispatch(
+          setUser({
+            user: data.existingUser,
+          })
+        );
+        return router.push(`/add-note`); //! make it / instead of /add-note
+      }
+
+      //?if user came from add-note page, then add the note to the database
+      if (router.query.from && router.query.from === 'add-note') {
+        //*login the user
+        const createdUser = await axios.post<
+          LoginForm,
+          AxiosResponse<{ existingUser: User; token: string }>
+        >('http://localhost:5000/api/users/login', creds, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        localStorage.setItem('token', createdUser.data.token);
+
+        console.log(createdUser.data.existingUser);
+        dispatch(
+          setUser({
+            user: createdUser.data.existingUser,
+          })
+        );
+        console.log(user); //! user: null because setState is async
+        return router.push(`/add-note`);
+        //   const storedNoteString = localStorage.getItem('storedNote');
+        //   if (!storedNoteString) return;
+        //   const note = JSON.parse(storedNoteString!);
+        //   console.log(note); // this works
+
+        //   //* adds the note to the database
+        //   const { data } = await axios.post(
+        //     'http://localhost:5000/api/notes',
+        //     { note, user },
+        //     {
+        //       headers: {
+        //         'Content-Type': 'application/json',
+        //         Authorization: `Bearer ${localStorage.getItem('token')}`,
+        //       },
+        //     }
+        //   );
+        //   console.log(data);
+        //   localStorage.removeItem('storedNote');
+      }
     } catch (err) {
       console.log(err);
     }
-    router.push(`/`);
   };
 
   return (

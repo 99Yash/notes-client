@@ -1,12 +1,13 @@
 import { useAppDispatch } from '@/hooks/redux';
 import { Note } from '@/interfaces/note.interface';
-import { addNote } from '@/store/slices/notes.slice';
+import { addNote, reset } from '@/store/slices/notes.slice';
 import { Inter } from '@next/font/google';
 import axios, { AxiosResponse } from 'axios';
 import { nanoid } from 'nanoid';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useAppSelector } from '../hooks/redux';
+import { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +21,6 @@ const AddNote = () => {
   });
 
   const router = useRouter();
-
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNote((prevNote) => ({ ...prevNote, title: e.target.value }));
   };
@@ -29,15 +29,26 @@ const AddNote = () => {
     setNote((prevNote) => ({ ...prevNote, content: e.target.value }));
   };
 
+  useEffect(() => {
+    const storedNote = localStorage.getItem('storedNote');
+    if (storedNote) {
+      setNote({
+        title: JSON.parse(storedNote).title,
+        content: JSON.parse(storedNote).content,
+        _id: undefined,
+      });
+      localStorage.removeItem('storedNote');
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return router.push('/log-in');
-    }
+    const token = localStorage.getItem('token'); //?if no token ==> err code 401, handled in catch block
 
     if (!note.title || !note.content) return;
+
     setNote((prevNote) => ({ ...prevNote, _id: nanoid() }));
+
     try {
       const { data } = await axios.post<
         Note,
@@ -65,8 +76,18 @@ const AddNote = () => {
           },
         })
       );
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      if (err.response.status === 401) {
+        dispatch(reset());
+        const storedNote = {
+          title: note.title,
+          content: note.content,
+        };
+        localStorage.setItem('storedNote', JSON.stringify(storedNote));
+        return router.push('/log-in?from=add-note');
+      } else {
+        console.log(err);
+      }
     }
     router.push('/');
     setNote({
