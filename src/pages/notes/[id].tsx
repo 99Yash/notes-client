@@ -1,4 +1,4 @@
-import { updateNote } from '@/store/slices/notes.slice';
+import { reset, updateNote } from '@/store/slices/notes.slice';
 import { Inter } from '@next/font/google';
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -15,7 +15,29 @@ const EditNote = () => {
 
   const dispatch = useAppDispatch();
 
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setNote((prevNote) => ({ ...prevNote, [name]: value }));
+  };
+
   useEffect(() => {
+    const storedNoteString = localStorage.getItem('storedNote');
+    if (storedNoteString) {
+      const storedNote = JSON.parse(storedNoteString);
+      //! not working
+      setNote({
+        _id: storedNote.id,
+        title: storedNote.title,
+        content: storedNote.content,
+      });
+      //! working
+      localStorage.removeItem('storedNote');
+      return;
+    }
     const fetchNote = async () => {
       try {
         const { data } = await axios.get(
@@ -41,6 +63,8 @@ const EditNote = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const token = localStorage.getItem('token'); //? if token d.n.e ==> error code 401 handled separately in catch block
+
     try {
       await axios.patch(
         `http://localhost:5000/api/notes/${id}`,
@@ -51,7 +75,7 @@ const EditNote = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -63,25 +87,21 @@ const EditNote = () => {
         })
       );
       router.push('/');
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      //? Authorization v2.0
+      if (error.response.status === 401) {
+        dispatch(reset());
+        const storedNoteAndId = {
+          title: note.title,
+          content: note.content,
+          id: note._id,
+        };
+        localStorage.setItem('storedNote', JSON.stringify(storedNoteAndId));
+        return router.push(`/log-in?from=edit-note`);
+      } else {
+        console.log(error);
+      }
     }
-    dispatch(
-      updateNote({
-        _id: id,
-        title: note.title,
-        content: note.content,
-      })
-    );
-  };
-
-  const handleChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setNote((prevNote) => ({ ...prevNote, [name]: value }));
   };
 
   return (

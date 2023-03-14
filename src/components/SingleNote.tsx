@@ -46,11 +46,13 @@ const SingleNote = (props: SingleNoteProps) => {
   return (
     <div
       onClick={handleEdit}
-      className=" flex justify-between cursor-pointer border rounded-sm p-4 m-4"
+      className=" flex justify-between cursor-pointer border rounded-lg shadow-md p-4 m-4"
     >
       <div className="flex flex-col">
-        <h1 className="text-md font-bold">{props.note.title}</h1>
-        <p>{props.note.content}</p>
+        <h1 className="text-md text-gray-300 font-semibold">
+          {props.note.title}
+        </h1>
+        <p className="text-sm text-gray-400">{props.note.content}</p>
       </div>
       <button
         onClick={handleDelete}

@@ -7,16 +7,30 @@ import { Inter } from '@next/font/google';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
-  const notes = useAppSelector((state) => state.notes);
+  const notes = useAppSelector((state) => state.notes); //! fetch notes from b/e
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const router = useRouter();
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      if (!user.user?._id) return;
+      const { data } = await axios.get(
+        `http://localhost:5000/api/notes/user/${user.user?._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      dispatch(setNotes({ notes: data }));
+    };
+    fetchNotes();
+  }, [dispatch, user.user?._id]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -58,7 +72,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${inter.className}`}>
+      <main className={` min-h-screen bg-black/70 ${inter.className}  `}>
         {notes.notes?.length > 0 &&
           notes.notes?.map((note: Note) => {
             return <SingleNote key={note._id} note={note} />;

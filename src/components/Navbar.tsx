@@ -53,7 +53,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className={`${inter.className} mb-12 w-full `}>
+    <div className={`${inter.className} mb-8 w-full `}>
       <nav className="pt-4">
         <ul className="flex gap-32 px-8 w-full justify-between">
           <div className="self-start">

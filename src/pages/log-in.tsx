@@ -38,6 +38,7 @@ const Login = () => {
     if (!creds.email || !creds.password) return;
 
     try {
+      //? normal login flow
       if (!router.query.from) {
         const { data } = await axios.post<
           LoginForm,
@@ -54,10 +55,10 @@ const Login = () => {
             user: data.existingUser,
           })
         );
-        return router.push(`/add-note`); //! make it / instead of /add-note
+        return router.push(`/`);
       }
 
-      //?if user came from add-note page, then add the note to the database
+      //* if user came from add-note page
       if (router.query.from && router.query.from === 'add-note') {
         //*login the user
         const createdUser = await axios.post<
@@ -76,26 +77,30 @@ const Login = () => {
             user: createdUser.data.existingUser,
           })
         );
-        console.log(user); //! user: null because setState is async
+        console.log(user); //? user: null because setState is async
         return router.push(`/add-note`);
-        //   const storedNoteString = localStorage.getItem('storedNote');
-        //   if (!storedNoteString) return;
-        //   const note = JSON.parse(storedNoteString!);
-        //   console.log(note); // this works
+      }
 
-        //   //* adds the note to the database
-        //   const { data } = await axios.post(
-        //     'http://localhost:5000/api/notes',
-        //     { note, user },
-        //     {
-        //       headers: {
-        //         'Content-Type': 'application/json',
-        //         Authorization: `Bearer ${localStorage.getItem('token')}`,
-        //       },
-        //     }
-        //   );
-        //   console.log(data);
-        //   localStorage.removeItem('storedNote');
+      //* if user came from edit-note page
+      if (router.query.from && router.query.from === `edit-note`) {
+        const createdUser = await axios.post<
+          LoginForm,
+          AxiosResponse<{ existingUser: User; token: string }>
+        >('http://localhost:5000/api/users/login', creds, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const storedNote = JSON.parse(localStorage.getItem('storedNote')!);
+        console.log('createdUser', createdUser.data.existingUser);
+        localStorage.setItem('token', createdUser.data.token);
+
+        dispatch(
+          setUser({
+            user: createdUser.data.existingUser,
+          })
+        );
+        return router.push(`/notes/${storedNote!.id}`);
       }
     } catch (err) {
       console.log(err);
